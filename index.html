@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADB Commands Reference</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #f5f5f5;
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      padding: 1.5rem;
+      background: #1e1e1e;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #00adb5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 1rem;
+    }
+
+    .card {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+      background: #232323;
+    }
+
+    .command {
+      font-family: monospace;
+      background: #2a2a2a;
+      padding: 0.5rem;
+      border-radius: 6px;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #00ffae;
+      overflow-x: auto;
+    }
+
+    .example {
+      font-family: monospace;
+      background: #252525;
+      padding: 0.5rem;
+      border-radius: 6px;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #ffcb6b;
+      overflow-x: auto;
+    }
+
+    .description {
+      font-size: 0.95rem;
+      color: #d3d3d3;
+    }
+
+    @media (max-width: 600px) {
+      .command, .example {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ADB Commands Reference</h1>
+  </header>
+
+  <div class="container" id="commands-container">
+    <!-- Commands will load here -->
+  </div>
+
+  <script>
+    // JSON ko load karo (same repo me rakho as commands.json)
+    fetch("commands.json")
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById("commands-container");
+        data.forEach(cmd => {
+          const card = document.createElement("div");
+          card.className = "card";
+
+          card.innerHTML = `
+            <div class="command">${cmd.command}</div>
+            <div class="example">Example: ${cmd.example}</div>
+            <div class="description">${cmd.description}</div>
+          `;
+
+          container.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error("Error loading JSON:", err);
+        document.getElementById("commands-container").innerHTML =
+          "<p>Failed to load commands.json 😢</p>";
+      });
+  </script>
+</body>
+</html>
