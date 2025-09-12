@@ -7,23 +7,26 @@
   <style>
     body {
       margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #121212;
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: #f5f5f5;
       line-height: 1.6;
     }
 
     header {
       text-align: center;
-      padding: 1.5rem;
-      background: #1e1e1e;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      padding: 2rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     header h1 {
       margin: 0;
-      font-size: 1.8rem;
-      color: #00adb5;
+      font-size: 2rem;
+      background: linear-gradient(45deg, #00ffcc, #00bfff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .container {
@@ -32,50 +35,67 @@
       padding: 1rem;
     }
 
-    .card {
-      background: #1e1e1e;
+    .search-box {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
       border-radius: 12px;
-      padding: 1rem;
+      border: none;
+      outline: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #f5f5f5;
+      backdrop-filter: blur(8px);
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 1.2rem;
       margin: 1rem 0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-      transition: transform 0.2s ease, background 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .card:hover {
-      transform: scale(1.02);
-      background: #232323;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.6);
     }
 
     .command {
       font-family: monospace;
-      background: #2a2a2a;
-      padding: 0.5rem;
-      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.6rem;
+      border-radius: 8px;
       display: block;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
       color: #00ffae;
       overflow-x: auto;
     }
 
     .example {
       font-family: monospace;
-      background: #252525;
-      padding: 0.5rem;
-      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.6rem;
+      border-radius: 8px;
       display: block;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
       color: #ffcb6b;
       overflow-x: auto;
     }
 
     .description {
       font-size: 0.95rem;
-      color: #d3d3d3;
+      color: #e0e0e0;
     }
 
     @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.6rem;
+      }
       .command, .example {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -85,34 +105,57 @@
     <h1>ADB Commands Reference</h1>
   </header>
 
-  <div class="container" id="commands-container">
-    <!-- Commands will load here -->
+  <div class="container">
+    <input type="text" id="search" class="search-box" placeholder="🔍 Search commands...">
+    <div id="commands-container">
+      <!-- Commands will load here -->
+    </div>
   </div>
 
   <script>
-    // JSON ko load karo (same repo me rakho as commands.json)
+    let commandsData = [];
+
+    // JSON load
     fetch("commands.json")
       .then(response => response.json())
       .then(data => {
-        const container = document.getElementById("commands-container");
-        data.forEach(cmd => {
-          const card = document.createElement("div");
-          card.className = "card";
-
-          card.innerHTML = `
-            <div class="command">${cmd.command}</div>
-            <div class="example">Example: ${cmd.example}</div>
-            <div class="description">${cmd.description}</div>
-          `;
-
-          container.appendChild(card);
-        });
+        commandsData = data;
+        renderCommands(data);
       })
       .catch(err => {
         console.error("Error loading JSON:", err);
         document.getElementById("commands-container").innerHTML =
           "<p>Failed to load commands.json 😢</p>";
       });
+
+    // Render cards
+    function renderCommands(data) {
+      const container = document.getElementById("commands-container");
+      container.innerHTML = "";
+      data.forEach(cmd => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <div class="command">${cmd.command}</div>
+          <div class="example">Example: ${cmd.example}</div>
+          <div class="description">${cmd.description}</div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Search filter
+    document.getElementById("search").addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = commandsData.filter(cmd =>
+        cmd.command.toLowerCase().includes(term) ||
+        cmd.example.toLowerCase().includes(term) ||
+        cmd.description.toLowerCase().includes(term)
+      );
+      renderCommands(filtered);
+    });
   </script>
 </body>
 </html>
