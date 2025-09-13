@@ -2,159 +2,372 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ADB Commands Reference</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ADB Commands · Clean Dark Reference</title>
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="Fast, mobile-first ADB command reference with smart search, copy buttons, and tags." />
   <style>
-    body {
-      margin: 0;
-      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #f5f5f5;
-      line-height: 1.6;
+    /* ---------- CSS RESET (trimmed) ---------- */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Cantarell,Noto Sans,sans-serif;color:#d9e1f2;background:#0b1220}
+    img,svg{vertical-align:middle}
+    button{font:inherit}
+
+    /* ---------- THEME & TOKENS ---------- */
+    :root{
+      --bg:#0b1220;            /* page background */
+      --panel:#0f172a;         /* cards */
+      --panel-2:#0c1426;       /* header, search */
+      --muted:#8aa0c8;         /* secondary text */
+      --text:#e6eefc;          /* primary text */
+      --accent:#7dd3fc;        /* cyan */
+      --accent-2:#a78bfa;      /* violet */
+      --good:#34d399;          /* green */
+      --warn:#fbbf24;          /* amber */
+      --danger:#f87171;        /* red */
+      --glass:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.08);
+      --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    }
+    @media (prefers-color-scheme: light){
+      :root{--bg:#0b1220;}
     }
 
-    header {
-      text-align: center;
-      padding: 2rem 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-      background: linear-gradient(45deg, #00ffcc, #00bfff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 1rem;
-    }
-
-    .search-box {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      margin-bottom: 1.5rem;
-      font-size: 1rem;
-      border-radius: 12px;
-      border: none;
-      outline: none;
-      background: rgba(255, 255, 255, 0.1);
-      color: #f5f5f5;
-      backdrop-filter: blur(8px);
-    }
-
-    .card {
-      background: rgba(255, 255, 255, 0.08);
+    /* ---------- LAYOUT ---------- */
+    header{
+      position:sticky;top:0;z-index:5;
       backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 1.2rem;
-      margin: 1rem 0;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      background: linear-gradient(180deg, rgba(15,23,42,.95), rgba(15,23,42,.7) 70%, transparent);
+      border-bottom:1px solid var(--border);
     }
-
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.6);
+    .wrap{max-width:1000px;margin:0 auto;padding:18px 14px}
+    .title{
+      display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap
     }
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#a78bfa);box-shadow:0 8px 18px rgba(56,189,248,.35)}
+    .brand h1{font-weight:750;font-size:1.15rem;margin:0;color:var(--text);letter-spacing:.2px}
+    .brand small{display:block;color:var(--muted);font-weight:500;opacity:.9}
 
-    .command {
-      font-family: monospace;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 0.6rem;
-      border-radius: 8px;
-      display: block;
-      margin-bottom: 0.6rem;
-      color: #00ffae;
-      overflow-x: auto;
+    .controls{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:12px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;box-shadow:none;transition:.2s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(0,0,0,.25)}
+    .btn[aria-pressed="true"]{outline:2px solid var(--accent)}
+    .btn .icon{width:18px;height:18px}
+
+    .search{display:flex;gap:10px;align-items:center;margin-top:12px}
+    .search input{flex:1;min-height:48px;border-radius:14px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);padding:12px 14px 12px 44px;outline:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+    .search input::placeholder{color:#93a6cc}
+    .search .search-icon{position:relative;left:36px}
+    .search .search-icon svg{position:absolute;top:13px;left:-30px;width:20px;height:20px;opacity:.85}
+    .search .count{white-space:nowrap;color:var(--muted);font-weight:600}
+
+    /* Quick chips generated from tokens */
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{border:1px solid var(--border);background:var(--panel);color:var(--text);padding:6px 10px;border-radius:999px;cursor:pointer;font-size:.85rem;opacity:.9}
+    .chip.active{outline:2px solid var(--accent);background:linear-gradient(135deg,rgba(125,211,252,.15),rgba(167,139,250,.15))}
+
+    main{padding:20px 14px}
+
+    /* Grid that collapses neatly on phones */
+    .grid{display:grid;grid-template-columns:repeat( auto-fit, minmax(280px,1fr) );gap:14px}
+
+    .card{
+      background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+      padding:14px;display:flex;flex-direction:column;gap:10px;transition:.2s
     }
+    .card:hover{transform:translateY(-3px)}
 
-    .example {
-      font-family: monospace;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 0.6rem;
-      border-radius: 8px;
-      display: block;
-      margin-bottom: 0.6rem;
-      color: #ffcb6b;
-      overflow-x: auto;
-    }
+    .cmd-line{font-family:var(--mono);background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.12);padding:10px;border-radius:12px;overflow:auto}
+    .cmd-line .t{white-space:pre-wrap;word-break:break-word}
+    .cmd-line .token.flag{color:#7dd3fc}
+    .cmd-line .token.kw{color:#60a5fa}
+    .cmd-line .token.bin{color:#22d3ee}
+    .cmd-line .token.place{color:#fbbf24}
 
-    .description {
-      font-size: 0.95rem;
-      color: #e0e0e0;
-    }
+    .row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .label{font-size:.8rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
 
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 1.6rem;
-      }
-      .command, .example {
-        font-size: 0.9rem;
-      }
+    .example,.desc{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px}
+    .example code{font-family:var(--mono)}
+
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .action{border:1px solid var(--border);background:transparent;color:var(--text);padding:7px 10px;border-radius:10px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+    .action:hover{background:rgba(255,255,255,.05)}
+
+    mark{background:linear-gradient(90deg,rgba(125,211,252,.25),rgba(167,139,250,.25));border-radius:6px;padding:0 2px}
+
+    .empty{opacity:.85;color:var(--muted);text-align:center;padding:40px 10px}
+
+    footer{padding:30px 14px;border-top:1px solid var(--border);color:var(--muted)}
+
+    /* Small tweaks for tiny phones */
+    @media (max-width:400px){
+      .cmd-line{font-size:.9rem}
+      .controls .btn{padding:8px 10px}
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>ADB Commands Reference</h1>
+    <div class="wrap">
+      <div class="title">
+        <div class="brand" aria-label="ADB Commands">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>ADB Commands</h1>
+            <small>Fast reference · mobile‑first</small>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="toggleView" aria-pressed="false" title="Toggle compact view">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/></svg>
+            Compact
+          </button>
+          <button class="btn" id="expandAll" title="Expand/collapse all">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Toggle details
+          </button>
+        </div>
+      </div>
+
+      <div class="search" role="search">
+        <span class="search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <input id="q" type="search" placeholder="Search: try force-stop, pm, logcat…  (press / to focus)" aria-label="Search commands" autocomplete="off" />
+        <span class="count" id="count">0 items</span>
+      </div>
+      <div class="chips" id="chips" aria-label="Quick filters"></div>
+    </div>
   </header>
 
-  <div class="container">
-    <input type="text" id="search" class="search-box" placeholder="🔍 Search commands...">
-    <div id="commands-container">
-      <!-- Commands will load here -->
-    </div>
-  </div>
+  <main class="wrap">
+    <div class="grid" id="grid" aria-live="polite" aria-busy="true"></div>
+    <div class="empty" id="empty" hidden>Nothing matched. Try broader words or clear filters.</div>
+  </main>
+
+  <footer class="wrap">
+    Tip: items with <code>&lt;angle‑brackets&gt;</code> are placeholders — replace with your own value.
+  </footer>
+
+  <template id="card-tpl">
+    <article class="card" data-collapsed="false">
+      <div class="row">
+        <span class="label">Command</span>
+        <div class="actions">
+          <button class="action copy-cmd" title="Copy command">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+          <button class="action collapse" title="Collapse/expand">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            Details
+          </button>
+        </div>
+      </div>
+      <div class="cmd-line"><div class="t"></div></div>
+      <div class="row"><span class="label">Example</span>
+        <button class="action copy-ex" title="Copy example">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="example"><code></code></div>
+      <div class="row"><span class="label">Description</span></div>
+      <div class="desc"></div>
+    </article>
+  </template>
 
   <script>
-    let commandsData = [];
+    // ---------- UTILITIES ----------
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
 
-    // JSON load
-    fetch("commands.json")
-      .then(response => response.json())
-      .then(data => {
-        commandsData = data;
-        renderCommands(data);
-      })
-      .catch(err => {
-        console.error("Error loading JSON:", err);
-        document.getElementById("commands-container").innerHTML =
-          "<p>Failed to load commands.json 😢</p>";
+    const state = {
+      raw: [],
+      filtered: [],
+      chips: new Set(),
+      compact: false,
+      allExpanded: true,
+    };
+
+    const grid = $('#grid');
+    const emptyEl = $('#empty');
+    const q = $('#q');
+    const count = $('#count');
+
+    // Syntax highlighting for ADB-ish commands
+    function syntaxify(str){
+      const safe = str.replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]));
+      // tokens: adb, shell, pm, am, flags (-r, --user), placeholders <...>
+      return safe
+        .replace(/\b(adb)\b/g,'<span class="token bin">$1</span>')
+        .replace(/\b(shell|pm|am|logcat|devices|tcpip|connect|disconnect|install|uninstall|start|stop|pull|push)\b/g,'<span class="token kw">$1</span>')
+        .replace(/(\s|^)\-\-?[\w-]+/g,'<span class="token flag">$&</span>')
+        .replace(/&lt;[^&]+&gt;/g,'<span class="token place">$&</span>');
+    }
+
+    // Highlight search matches
+    function highlight(text, term){
+      if(!term) return text;
+      try {
+        const re = new RegExp('(' + term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','ig');
+        return text.replace(re,'<mark>$1</mark>');
+      } catch { return text; }
+    }
+
+    // Copy helper with tiny toast
+    function copy(text){
+      navigator.clipboard.writeText(text).then(()=>toast('Copied'))
+        .catch(()=>toast('Copy failed', true));
+    }
+
+    function toast(msg, isErr=false){
+      const t = document.createElement('div');
+      t.textContent = msg;
+      Object.assign(t.style,{
+        position:'fixed',bottom:'16px',left:'50%',transform:'translateX(-50%)',
+        background:isErr?'#3f1d1d':'#142b1e',color:isErr?'#fecaca':'#bbf7d0',
+        border:'1px solid var(--border)',padding:'10px 14px',borderRadius:'12px',
+        boxShadow:'var(--shadow)',zIndex:50,opacity:'0'
       });
+      document.body.appendChild(t); requestAnimationFrame(()=>{t.style.transition='opacity .2s';t.style.opacity='1'});
+      setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),250)},1200);
+    }
+
+    // Read query param ?q=
+    function initQueryFromURL(){
+      const params = new URLSearchParams(location.search);
+      const val = params.get('q') || '';
+      if(val){ q.value = val; }
+    }
+    function syncQueryToURL(){
+      const params = new URLSearchParams(location.search);
+      const v = q.value.trim();
+      if(v) params.set('q', v); else params.delete('q');
+      history.replaceState(null,'', '?' + params.toString());
+    }
+
+    // Build chips from most frequent tokens across commands
+    function buildChips(data){
+      const freq = Object.create(null);
+      const stop = new Set(['adb','shell','the','a','to','for','of','and','or']);
+      data.forEach(({command})=>{
+        command.toLowerCase().split(/[^a-z0-9\-]+/).forEach(tok=>{
+          if(!tok || stop.has(tok) || tok.length<2) return;
+          freq[tok] = (freq[tok]||0)+1;
+        })
+      });
+      const top = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([t])=>t);
+      const holder = $('#chips'); holder.innerHTML='';
+      top.forEach(tok=>{
+        const c = document.createElement('button');
+        c.className='chip'; c.textContent=tok; c.dataset.tok=tok;
+        c.addEventListener('click',()=>{
+          if(state.chips.has(tok)) state.chips.delete(tok); else state.chips.add(tok);
+          c.classList.toggle('active');
+          filter();
+        });
+        holder.appendChild(c);
+      })
+    }
+
+    // Fetch data
+    fetch('commands.json')
+      .then(r=>r.json())
+      .then(data=>{
+        state.raw = Array.isArray(data)? data : [];
+        initQueryFromURL();
+        buildChips(state.raw);
+        filter();
+      })
+      .catch(err=>{
+        console.error(err);
+        grid.innerHTML = '<div class="empty">Failed to load <b>commands.json</b>. Add it next to this page.</div>';
+        emptyEl.hidden = true;
+      })
+      .finally(()=> grid.setAttribute('aria-busy','false'));
+
+    // Filter logic: supports multi-term search, quoted phrases. Chips must also match.
+    function filter(){
+      const term = q.value.trim();
+      const terms = [];
+      term.replace(/\"([^\"]+)\"|([^\s]+)/g,(m,a,b)=>terms.push((a||b).toLowerCase()));
+      const chipTerms = Array.from(state.chips);
+
+      const list = state.raw.filter(it=>{
+        const hay = (it.command + ' ' + it.example + ' ' + it.description).toLowerCase();
+        const okText = terms.every(t=>hay.includes(t));
+        const okChips = chipTerms.every(t=>hay.includes(t));
+        return okText && okChips;
+      });
+      state.filtered = list;
+      render(list, term);
+      count.textContent = `${list.length} item${list.length!==1?'s':''}`;
+      emptyEl.hidden = list.length !== 0;
+      syncQueryToURL();
+    }
 
     // Render cards
-    function renderCommands(data) {
-      const container = document.getElementById("commands-container");
-      container.innerHTML = "";
-      data.forEach(cmd => {
-        const card = document.createElement("div");
-        card.className = "card";
+    function render(data, term){
+      grid.innerHTML='';
+      const tpl = $('#card-tpl');
+      data.forEach(item=>{
+        const node = tpl.content.cloneNode(true);
+        const card = node.querySelector('.card');
+        const cmdT = node.querySelector('.cmd-line .t');
+        const exC = node.querySelector('.example code');
+        const desc = node.querySelector('.desc');
 
-        card.innerHTML = `
-          <div class="command">${cmd.command}</div>
-          <div class="example">Example: ${cmd.example}</div>
-          <div class="description">${cmd.description}</div>
-        `;
+        cmdT.innerHTML = highlight(syntaxify(item.command), term);
+        exC.innerHTML = highlight(item.example.replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s])), term);
+        desc.innerHTML = highlight(item.description.replace(/[&<>]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[s])), term);
 
-        container.appendChild(card);
+        // Actions
+        node.querySelector('.copy-cmd').addEventListener('click',()=>copy(item.command));
+        node.querySelector('.copy-ex').addEventListener('click',()=>copy(item.example));
+
+        const collapseBtn = node.querySelector('.collapse');
+        collapseBtn.addEventListener('click',()=>{
+          const collapsed = card.getAttribute('data-collapsed') === 'true';
+          card.setAttribute('data-collapsed', String(!collapsed));
+          card.querySelectorAll('.example,.desc,.row:nth-of-type(2),.row:nth-of-type(3)').forEach(el=>{
+            el.style.display = collapsed ? '' : 'none';
+          });
+        });
+
+        if(state.compact){
+          card.setAttribute('data-collapsed','true');
+          card.querySelectorAll('.example,.desc,.row:nth-of-type(2),.row:nth-of-type(3)').forEach(el=> el.style.display='none');
+        }
+        grid.appendChild(node);
       });
     }
 
-    // Search filter
-    document.getElementById("search").addEventListener("input", (e) => {
-      const term = e.target.value.toLowerCase();
-      const filtered = commandsData.filter(cmd =>
-        cmd.command.toLowerCase().includes(term) ||
-        cmd.example.toLowerCase().includes(term) ||
-        cmd.description.toLowerCase().includes(term)
-      );
-      renderCommands(filtered);
+    // Events
+    q.addEventListener('input', ()=> filter());
+    document.addEventListener('keydown', e=>{
+      if(e.key === '/') { e.preventDefault(); q.focus(); q.select(); }
+    });
+
+    $('#toggleView').addEventListener('click', (e)=>{
+      state.compact = !state.compact;
+      e.currentTarget.setAttribute('aria-pressed', String(state.compact));
+      filter();
+    });
+
+    $('#expandAll').addEventListener('click', ()=>{
+      state.allExpanded = !state.allExpanded;
+      $$('.card').forEach(card=>{
+        card.setAttribute('data-collapsed', String(!state.allExpanded));
+        card.querySelectorAll('.example,.desc,.row:nth-of-type(2),.row:nth-of-type(3)').forEach(el=>{
+          el.style.display = state.allExpanded ? '' : 'none';
+        });
+      })
     });
   </script>
 </body>
